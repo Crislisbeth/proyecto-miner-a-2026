@@ -168,23 +168,75 @@ section[data-testid="stSidebar"] * {
 }
 
 /* Classification Results */
-.res-box {
-    padding: 45px;
-    border-radius: 24px;
-    text-align: center;
-    margin-top: 25px;
+/* Classification Results - New Premium Design */
+.res-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    border-radius: 30px;
+    background: var(--pure-white);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+    margin-top: 30px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .res-muchas {
-    background: var(--spotify-black);
-    color: var(--spotify-green) !important;
-    border: 2px solid var(--spotify-green);
+    border: 1px solid rgba(29, 185, 84, 0.3);
+    background: linear-gradient(180deg, rgba(29, 185, 84, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
 .res-pocas {
-    background: var(--soft-grey);
-    color: var(--text-dim) !important;
-    border: 1px solid var(--border-light);
+    border: 1px solid rgba(225, 29, 72, 0.2);
+    background: linear-gradient(180deg, rgba(225, 29, 72, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.confidence-label {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.confidence-value {
+    font-size: 5rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.verdict-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin: 10px 0;
+}
+
+.verdict-subtitle {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    border-radius: 100px;
+    display: inline-block;
+}
+
+.sub-muchas {
+    color: var(--spotify-green);
+    background: rgba(29, 185, 84, 0.1);
+}
+
+.sub-pocas {
+    color: #e11d48;
+    background: rgba(225, 29, 72, 0.1);
 }
 
 /* Tabs */

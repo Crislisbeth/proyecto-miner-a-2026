@@ -56,7 +56,7 @@ def load_analysis_data():
         features = joblib.load(os.path.join(models_dir, 'features_list.joblib'))
         
         # Limpieza profunda de datos para asegurar visualizaciones precisas y sin ruido
-        df = df[['popularity', 'track_genre', 'track_name', 'artists'] + features].dropna()
+        df = df[['track_id', 'popularity', 'track_genre', 'track_name', 'artists'] + features].dropna()
         df = df.drop_duplicates(subset=['track_name', 'artists'])
         df = df[(df['tempo'] > 20) & (df['tempo'] < 250)].reset_index(drop=True)
         
@@ -104,9 +104,9 @@ def main():
     if m == "INICIO":
         st.markdown('''
             <div class="header-box">
-                <p class="header-pre">SISTEMA DE ANALÍTICA AVANZADA</p>
-                <h1 class="header-title-main">TENDENCIAS</h1>
-                <p class="header-title-sub">Clasificador Profesional de Popularidad Musical</p>
+                <p class="header-pre">MINERÍA DE DATOS SPOTIFY</p>
+                <h1 class="header-title-main">CLASIFICADOR MUSICAL</h1>
+                <p class="header-title-sub">Análisis Predictivo de Popularidad y Tendencias en Streaming</p>
             </div>
         ''', unsafe_allow_html=True)
         
@@ -132,41 +132,45 @@ def main():
             st.markdown(f'''
                 <div class="metric-grid">
                     <div class="metric-box">
-                        <p class="metric-label-new">Big Data</p>
+                        <p class="metric-label-new">Datos</p>
                         <p class="metric-value-new">{len(df):,}</p>
                         <p style="font-size:0.7rem; color:var(--text-dim); margin:0;">Pistas Procesadas</p>
-                    </div>
-                    <div class="metric-box">
-                        <p class="metric-label-new">Infraestructura</p>
-                        <p class="metric-value-new" style="color:var(--spotify-green); font-size:1.2rem;">Modelos .joblib</p>
-                        <p style="font-size:0.7rem; color:var(--text-dim); margin:0;">Carga de Conocimiento</p>
                     </div>
                 </div>
             ''', unsafe_allow_html=True)
 
     # VISTA 2: RANKING - El estado actual del catálogo
     elif m == "RANKING":
-        st.markdown('<div class="header-box" style="padding: 30px;"><p class="header-pre">Charts</p><h2 style="font-family:\'Outfit\'; font-weight:800; font-size: 2.8rem; margin:0; color:var(--spotify-black);">Ranking Global</h2></div>', unsafe_allow_html=True)
+        st.markdown('<div class="header-box" style="padding: 30px;"><p class="header-pre">Estadísticas</p><h2 style="font-family:\'Outfit\'; font-weight:800; font-size: 2.8rem; margin:0; color:var(--spotify-black);">Ranking Global</h2></div>', unsafe_allow_html=True)
         
         col_top, col_flop = st.columns(2)
         with col_top:
             st.markdown("<p style='font-weight:700; color:#1DB954; margin:20px 0 10px 0; text-transform:uppercase; font-size:0.9rem; font-family:Outfit;'>🔥 Los Éxitos del Momento</p>", unsafe_allow_html=True)
-            st.dataframe(df.nlargest(10, 'popularity')[['track_name', 'artists', 'popularity']], use_container_width=True, hide_index=True)
+            top_df = df.nlargest(10, 'popularity')[['track_name', 'artists', 'popularity', 'track_id']]
+            top_df['Enlace'] = "https://open.spotify.com/track/" + top_df['track_id']
+            st.dataframe(top_df[['track_name', 'artists', 'popularity', 'Enlace']], 
+                         use_container_width=True, hide_index=True,
+                         column_config={"Enlace": st.column_config.LinkColumn("Escuchar")})
 
         with col_flop:
             st.markdown("<p style='font-weight:700; color:#e11d48; margin:20px 0 10px 0; text-transform:uppercase; font-size:0.9rem; font-family:Outfit;'>📉 Bajo Perfil Comercial</p>", unsafe_allow_html=True)
-            st.dataframe(df.nsmallest(10, 'popularity')[['track_name', 'artists', 'popularity']], use_container_width=True, hide_index=True)
+            flop_df = df.nsmallest(10, 'popularity')[['track_name', 'artists', 'popularity', 'track_id']]
+            flop_df['Enlace'] = "https://open.spotify.com/track/" + flop_df['track_id']
+            st.dataframe(flop_df[['track_name', 'artists', 'popularity', 'Enlace']], 
+                         use_container_width=True, hide_index=True,
+                         column_config={"Enlace": st.column_config.LinkColumn("Escuchar")})
 
     # VISTA 3: TENDENCIAS - Exploración estadística y segmentación
     elif m == "TENDENCIAS":
-        st.markdown('<div class="header-box" style="padding: 30px;"><p class="header-pre">Data Viz</p><h2 style="font-family:\'Outfit\'; font-weight:800; font-size: 2.8rem; margin:0;">Explorador de Tendencias</h2></div>', unsafe_allow_html=True)
+        st.markdown('<div class="header-box" style="padding: 30px;"><p class="header-pre">Visualizaciones</p><h2 style="font-family:\'Outfit\'; font-weight:800; font-size: 2.8rem; margin:0;">Explorador de Tendencias</h2></div>', unsafe_allow_html=True)
         
         t1, t2, t3 = st.tabs(["DISTRIBUCIÓN", "FACTORES", "SEGMENTACIÓN"])
         
         with t1:
             # Gráfico de barras/histograma de popularidad
             st.markdown("<p style='font-weight:600; color:var(--text-dim); margin-top:20px;'>Niveles de Popularidad en el Catálogo</p>", unsafe_allow_html=True)
-            fig = px.histogram(df, x='popularity', nbins=50, color_discrete_sequence=['#1DB954'])
+            fig = px.histogram(df, x='popularity', nbins=50, color_discrete_sequence=['#1DB954'], 
+                               labels={'popularity': 'Popularidad', 'count': 'Frecuencia'})
             fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="black")
             st.plotly_chart(fig, use_container_width=True)
             
@@ -177,20 +181,23 @@ def main():
             labels_map = {'danceability': 'Bailabilidad', 'energy': 'Energía', 'loudness': 'Volumen', 'speechiness': 'Voz', 'acousticness': 'Acústica', 'instrumentalness': 'Instrumental', 'liveness': 'En Vivo', 'valence': 'Positividad', 'tempo': 'Tempo'}
             corr.index = [labels_map.get(i, i) for i in corr.index]
             
-            fig_b = px.bar(x=corr.values[:-1], y=corr.index[:-1], orientation='h', color_discrete_sequence=['#1DB954'])
+            fig_b = px.bar(x=corr.values[:-1], y=corr.index[:-1], orientation='h', color_discrete_sequence=['#1DB954'],
+                           labels={'x': 'Correlación', 'y': 'Variable'})
             fig_b.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="black")
             st.plotly_chart(fig_b, use_container_width=True)
 
         with t3:
-            # Visualización interactiva de Clusters музыкальных
+            # Visualización interactiva de Clusters musicales
             st.markdown("<p style='font-weight:600; color:var(--text-dim); margin-top:20px;'>Agrupación Matemática del Catálogo (KMeans)</p>", unsafe_allow_html=True)
-            fig_c = px.scatter(df.sample(min(5000, len(df))), x='danceability', y='energy', color='cluster', color_continuous_scale=['#000000', '#1DB954', '#64748b'])
+            fig_c = px.scatter(df.sample(min(5000, len(df))), x='danceability', y='energy', color='cluster', 
+                               color_continuous_scale=['#000000', '#1DB954', '#64748b'],
+                               labels={'danceability': 'Bailabilidad', 'energy': 'Energía', 'cluster': 'Grupo'})
             fig_c.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="black")
             st.plotly_chart(fig_c, use_container_width=True)
 
     # VISTA 4: ANÁLISIS - Detalle técnico de los algoritmos
     elif m == "ANÁLISIS":
-        st.markdown('<div class="header-box" style="padding: 30px;"><p class="header-pre">Data Mining</p><h2 style="font-family:\'Outfit\'; font-weight:800; font-size: 2.8rem; margin:0;">Métricas de los Modelos</h2></div>', unsafe_allow_html=True)
+        st.markdown('<div class="header-box" style="padding: 30px;"><p class="header-pre">Análisis de Datos</p><h2 style="font-family:\'Outfit\'; font-weight:800; font-size: 2.8rem; margin:0;">Métricas de los Modelos</h2></div>', unsafe_allow_html=True)
         
         at1, at2 = st.tabs(["COMPARATIVA", "OPTIMIZACIÓN DE CLUSTERS"])
         
@@ -228,22 +235,38 @@ def main():
             dv = {f: float(si[f]) for f in features}
         else:
             dv = {f: 0.5 for f in features}; dv['loudness'] = -30.0; dv['tempo'] = 120
+           
+        # Explicación pedagógica para docentes y usuarios
+        with st.expander("GUÍA DE VARIABLES: ¿Qué significa cada atributo?"):
+            st.markdown("""
+            <div style="font-size: 0.95rem; color: #475569; line-height: 1.6;">
+                <p><b>Bailabilidad:</b> Qué tan adecuada es la canción para bailar basándose en el tempo, estabilidad del ritmo y fuerza del beat.</p>
+                <p><b>Energía:</b> Medida de intensidad y actividad. Las canciones rápidas y ruidosas (como el metal) tienen alta energía.</p>
+                <p><b>Volumen (dB):</b> El volumen promedio de la pista en decibelios. Los valores suelen estar entre -60 y 0 db.</p>
+                <p><b>Palabras (Voz):</b> Detecta la presencia de palabras habladas. Valores altos indican podcasts o rap; valores bajos indican música instrumental.</p>
+                <p><b>Acústica:</b> Confianza de si la pista es acústica (1.0) o electrónica/producida (0.0).</p>
+                <p><b>Instrumentalidad:</b> Predice si el track no contiene voces. Los solos de piano están cerca de 1.0.</p>
+                <p><b>Liveness:</b> Detecta la presencia de audiencia en la grabación (conciertos en vivo).</p>
+                <p><b>Positividad (Valence):</b> Describe la "alegría" musical. Alto valence suena feliz; bajo valence suena triste o enojado.</p>
+                <p><b>Tempo (BPM):</b> Velocidad promedio de la canción en pulsos por minuto.</p>
+            </div>
+            """, unsafe_allow_html=True)
             
         with st.form("form_predict"):
             st.markdown("<p style='font-weight:700; color:var(--text-dim); text-transform:uppercase; font-size:0.8rem; font-family:Outfit;'>Configura el ADN Acústico de la Canción</p>", unsafe_allow_html=True)
             co1, co2, co3 = st.columns(3)
             with co1:
-                d = st.slider("Bailabilidad", 0.0, 1.0, dv['danceability'])
-                e = st.slider("Energía", 0.0, 1.0, dv['energy'])
-                l = st.slider("Volumen (dB)", -60.0, 0.0, dv['loudness'])
+                d = st.slider("Bailabilidad", 0.0, 1.0, dv['danceability'], help="0.0 es nada bailable, 1.0 es muy bailable")
+                e = st.slider("Energía", 0.0, 1.0, dv['energy'], help="Intensidad rítmica y volumen")
+                l = st.slider("Volumen (dB)", -60.0, 0.0, dv['loudness'], help="Más cerca de 0 es más fuerte")
             with co2:
-                s = st.slider("Palabras (Voz)", 0.0, 1.0, dv['speechiness'])
-                a = st.slider("Acústica", 0.0, 1.0, dv['acousticness'])
-                i = st.slider("Instrumentalidad", 0.0, 1.0, dv['instrumentalness'])
+                s = st.slider("Palabras (Voz)", 0.0, 1.0, dv['speechiness'], help="Presencia de voz hablada")
+                a = st.slider("Acústica", 0.0, 1.0, dv['acousticness'], help="1.0 es puramente acústico")
+                i = st.slider("Instrumentalidad", 0.0, 1.0, dv['instrumentalness'], help="Falta de voces en la pista")
             with co3:
-                lv = st.slider("Liveness", 0.0, 1.0, dv['liveness'])
-                v = st.slider("Positividad (Valence)", 0.0, 1.0, dv['valence'])
-                t = st.slider("Tempo (BPM)", 50, 250, int(dv['tempo']))
+                lv = st.slider("Liveness", 0.0, 1.0, dv['liveness'], help="Si fue grabada en vivo")
+                v = st.slider("Positividad (Valence)", 0.0, 1.0, dv['valence'], help="Felicidad/Tristeza de la melodía")
+                t = st.slider("Tempo (BPM)", 50, 250, int(dv['tempo']), help="Velocidad: Lento (<100) / Rápido (>120)")
             
             # Botón detonante del análisis
             btn = st.form_submit_button("EVALUAR VIABILIDAD COMERCIAL", use_container_width=True)
@@ -253,14 +276,46 @@ def main():
                 input_vector = sc.transform(np.array([[d, e, l, s, a, i, lv, v, t]]))
                 proba = model_rf.predict_proba(input_vector)[0][1]
                 
-                # Resultado basado en el análisis probabilístico de los modelos
-                st.markdown(f'<div style="text-align: center; margin-top:20px;"><p style="color:#64748b; font-size:0.9rem;">CONFIANZA DE LOS MODELOS (.JOBLIB)</p><h1 style="font-size:4.5rem; font-weight:800; color:{"#1DB954" if proba >= 0.4 else "#e11d48"};">{proba*100:.1f}%</h1></div>', unsafe_allow_html=True)
+                # Definir clase y contenido según resultado
+                res_class = "res-muchas" if proba >= 0.4 else "res-pocas"
+                sub_class = "sub-muchas" if proba >= 0.4 else "sub-pocas"
+                verdict = "ALTO POTENCIAL" if proba >= 0.4 else "BAJO POTENCIAL"
+                sub_verdict = "SE RECOMIENDA INVERSIÓN" if proba >= 0.4 else "RIESGO DE MERCADO"
+                color = "#1DB954" if proba >= 0.4 else "#e11d48"
+
+                # Nueva visualización unificada y premium
+                st.markdown(f"""
+                <div class="res-container {res_class}">
+                    <p class="confidence-label">Confianza de los Modelos (.joblib)</p>
+                    <h1 class="confidence-value" style="color: {color};">{proba*100:.1f}%</h1>
+                    <div class="verdict-subtitle {sub_class}">{sub_verdict}</div>
+                    <h2 class="verdict-title" style="color: var(--spotify-black);">{verdict}</h2>
+                </div>
+                """, unsafe_allow_html=True)
                 
-                if proba >= 0.4:
-                    st.balloons()
-                    st.markdown('<div class="res-box res-muchas"><h2 style="font-family:\'Outfit\';">¡ALTO POTENCIAL! Se recomienda inversión.</h2></div>', unsafe_allow_html=True)
-                else:
-                    st.markdown('<div class="res-box res-pocas"><h2 style="font-family:\'Outfit\';">RIESGO ELEVADO. El potencial comercial es bajo.</h2></div>', unsafe_allow_html=True)
+                # Mostrar enlace si hay una canción de referencia (mejorado)
+                if s_s != "Ninguna":
+                    track_url = f"https://open.spotify.com/track/{si['track_id']}"
+                    st.markdown(f"""
+                        <div style="text-align: center; margin-top: 25px;">
+                            <a href="{track_url}" target="_blank" style="
+                                color: var(--pure-white); 
+                                background: var(--spotify-green);
+                                text-decoration: none; 
+                                font-weight: 700; 
+                                padding: 12px 30px; 
+                                border-radius: 50px;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                                font-size: 0.8rem;
+                                display: inline-block;
+                                box-shadow: 0 10px 20px rgba(29, 185, 84, 0.2);
+                                transition: all 0.3s ease;
+                            ">
+                                Escuchar Referencia en Spotify
+                            </a>
+                        </div>
+                    """, unsafe_allow_html=True)
 
     # VISTA 6: INDUSTRIAS - Aplicaciones del mundo real
     elif m == "INDUSTRIAS":
