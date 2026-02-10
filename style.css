@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Outfit:wght@800&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+:root {
+    --spotify-green: #1DB954;
+    --spotify-black: #121212;
+    --soft-grey: #F8FAFC;
+    --pure-white: #FFFFFF;
+    --border-light: #E2E8F0;
+    --text-main: #1A202C;
+    --text-dim: #718096;
+}
+
+/* Global Styles */
+html,
+body,
+[class*="css"] {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--text-main) !important;
+}
+
+.stApp {
+    background-color: var(--pure-white);
+}
+
+/* Sidebar - Keep it dark for contrast or light? User said "keep what is white". Let's make it light too. */
+section[data-testid="stSidebar"] {
+    background-color: var(--soft-grey) !important;
+    border-right: 1px solid var(--border-light);
+}
+
+section[data-testid="stSidebar"] * {
+    color: var(--text-main) !important;
+}
+
+.sidebar-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    letter-spacing: -1px;
+    font-size: 1.6rem;
+    color: var(--spotify-black) !important;
+}
+
+.sidebar-subtitle {
+    font-size: 0.7rem;
+    color: var(--spotify-green) !important;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-top: -5px;
+    font-weight: 700;
+}
+
+/* Main Container Optimization */
+.main .block-container {
+    padding-top: 2rem !important;
+    padding-bottom: 3rem !important;
+    max-width: 95% !important;
+}
+
+/* Premium Header Design (Light) */
+.header-box {
+    background: var(--soft-grey);
+    padding: 35px 45px;
+    border-radius: 24px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+}
+
+.header-pre {
+    color: var(--spotify-green);
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+}
+
+.header-title-main {
+    font-family: 'Outfit', sans-serif;
+    font-size: 4rem !important;
+    font-weight: 800;
+    letter-spacing: -3px;
+    color: var(--spotify-black);
+    line-height: 1;
+    margin: 0;
+}
+
+.header-title-sub {
+    font-size: 1.3rem;
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-top: 10px;
+}
+
+/* Enhanced Content Cards (Light Premium) */
+.glass-card {
+    background: var(--pure-white);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
+    border-color: var(--spotify-green);
+}
+
+/* Metric Layout */
+.metric-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    width: 100%;
+}
+
+.metric-box {
+    background: var(--pure-white);
+    padding: 22px;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    flex: 1;
+    transition: border-color 0.3s ease;
+}
+
+.metric-box:hover {
+    border-color: var(--spotify-green);
+}
+
+.metric-label-new {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+}
+
+.metric-value-new {
+    color: var(--spotify-black);
+    font-size: 2.2rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -1px;
+}
+
+/* Action Buttons */
+.stButton>button {
+    background: var(--spotify-black) !important;
+    color: white !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    padding: 0.8rem 2.2rem !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stButton>button:hover {
+    background: var(--spotify-green) !important;
+    box-shadow: 0 8px 15px rgba(29, 185, 84, 0.2);
+}
+
+/* Classification Results */
+.res-box {
+    padding: 45px;
+    border-radius: 24px;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.res-muchas {
+    background: var(--spotify-black);
+    color: var(--spotify-green) !important;
+    border: 2px solid var(--spotify-green);
+}
+
+.res-pocas {
+    background: var(--soft-grey);
+    color: var(--text-dim) !important;
+    border: 1px solid var(--border-light);
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 25px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    color: var(--text-dim) !important;
+}
+
+.stTabs [aria-selected="true"] {
+    color: var(--spotify-black) !important;
+    border-bottom-color: var(--spotify-green) !important;
+}
+
+/* Overrides */
+[data-testid="stMetricValue"] {
+    color: var(--spotify-black) !important;
+}
+
+footer {
+    visibility: hidden;
+}
